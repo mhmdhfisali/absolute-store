@@ -1,0 +1,56 @@
+services:
+  as-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: "absolute_store_app"
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./:/var/www
+    ports:
+      - "8005:8000"
+    networks:
+      - as-network
+    command: sh -c "php artisan serve --host=0.0.0.0 --port=8000"
+    depends_on:
+      - as-mysql
+
+  as-mysql:
+    image: "mysql/mysql-server:8.0"
+    container_name: "absolute_store_db"
+    ports:
+      - "3308:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: "root"
+      MYSQL_ROOT_HOST: "%"
+      MYSQL_DATABASE: "absolute_store"
+      MYSQL_USER: "absolutelie"
+      MYSQL_PASSWORD: "password"
+    volumes:
+      - "as-mysql-data:/var/lib/mysql"
+    networks:
+      - as-network
+    restart: unless-stopped
+
+  as-pma:
+    image: "phpmyadmin:latest"
+    container_name: "absolute_store_pma"
+    ports:
+      - "8085:80"
+    environment:
+      PMA_HOST: as-mysql
+      PMA_USER: root
+      PMA_PASSWORD: root
+    networks:
+      - as-network
+    depends_on:
+      - as-mysql
+
+networks:
+  as-network:
+    driver: bridge
+
+volumes:
+  as-mysql-data:
+    driver: local
