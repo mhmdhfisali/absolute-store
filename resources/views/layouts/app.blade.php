@@ -8,14 +8,16 @@
 
     <title>{{ config('app.name', 'Absolute Store') }} - Console</title>
 
-    <!-- Skrip Inisialisasi Tema Cepat -->
+    <!-- Skrip Inisialisasi Tema Instan Sebelum Halaman Render -->
     <script>
-        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia(
-                '(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light') {
+                document.documentElement.classList.remove('dark');
+            } else {
+                document.documentElement.classList.add('dark');
+            }
+        })();
     </script>
 
     <!-- Fonts -->
@@ -26,11 +28,102 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
 
+    <!-- CSS PENGUNCI TEMA TERANG & GELAP (MUTLAK & PASTI BERUBAH) -->
     <style>
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
+            transition: background-color 0.2s ease, color 0.2s ease;
         }
 
+        /* ATURAN SAAT MODE GELAP (html.dark) */
+        html.dark body {
+            background-color: #080c15 !important;
+            color: #f8fafc !important;
+        }
+
+        html.dark aside {
+            background-color: #0d1322 !important;
+            border-color: #1e293b !important;
+            color: #f8fafc !important;
+        }
+
+        html.dark header {
+            background-color: #0d1322 !important;
+            border-color: #1e293b !important;
+            color: #f8fafc !important;
+        }
+
+        html.dark .card {
+            background-color: #0d1322 !important;
+            border-color: #1e293b !important;
+            color: #f8fafc !important;
+        }
+
+        html.dark .form-input-theme {
+            background-color: #090e1b !important;
+            border-color: #1e293b !important;
+            color: #ffffff !important;
+        }
+
+        html.dark .table-head-theme {
+            background-color: #090e1b !important;
+            border-color: #1e293b !important;
+            color: #94a3b8 !important;
+        }
+
+        html.dark table tbody tr {
+            border-color: #1e293b !important;
+        }
+
+        html.dark table tbody tr:hover {
+            background-color: rgba(30, 41, 59, 0.4) !important;
+        }
+
+        /* ATURAN SAAT MODE TERANG (html:not(.dark)) */
+        html:not(.dark) body {
+            background-color: #f1f5f9 !important;
+            color: #0f172a !important;
+        }
+
+        html:not(.dark) aside {
+            background-color: #ffffff !important;
+            border-color: #e2e8f0 !important;
+            color: #0f172a !important;
+        }
+
+        html:not(.dark) header {
+            background-color: #ffffff !important;
+            border-color: #e2e8f0 !important;
+            color: #0f172a !important;
+        }
+
+        html:not(.dark) .card {
+            background-color: #ffffff !important;
+            border-color: #e2e8f0 !important;
+            color: #0f172a !important;
+        }
+
+        html:not(.dark) .form-input-theme {
+            background-color: #f8fafc !important;
+            border-color: #cbd5e1 !important;
+            color: #0f172a !important;
+        }
+
+        html:not(.dark) .table-head-theme {
+            background-color: #f8fafc !important;
+            border-color: #e2e8f0 !important;
+            color: #64748b !important;
+        }
+
+        html:not(.dark) table tbody tr {
+            border-color: #f1f5f9 !important;
+        }
+
+        html:not(.dark) table tbody tr:hover {
+            background-color: #f8fafc !important;
+        }
+
+        /* Scrollbar */
         ::-webkit-scrollbar {
             width: 5px;
             height: 5px;
@@ -45,45 +138,42 @@
             border-radius: 4px;
         }
 
-        .dark ::-webkit-scrollbar-thumb {
+        html.dark ::-webkit-scrollbar-thumb {
             background: #334155;
         }
     </style>
 </head>
 
-<body
-    class="bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-100 antialiased transition-colors duration-200"
-    x-data="{
-        sidebarOpen: (window.innerWidth >= 1024),
-        isDark: document.documentElement.classList.contains('dark'),
-        toggleSidebar() {
-            this.sidebarOpen = !this.sidebarOpen;
-        },
-        toggleTheme() {
-            this.isDark = !this.isDark;
-            if (this.isDark) {
-                document.documentElement.classList.add('dark');
-                localStorage.setItem('theme', 'dark');
-            } else {
-                document.documentElement.classList.remove('dark');
-                localStorage.setItem('theme', 'light');
-            }
+<body class="antialiased transition-colors duration-200" x-data="{
+    sidebarOpen: (window.innerWidth >= 1024),
+    isDark: document.documentElement.classList.contains('dark'),
+    toggleSidebar() {
+        this.sidebarOpen = !this.sidebarOpen;
+    },
+    toggleTheme() {
+        this.isDark = !this.isDark;
+        if (this.isDark) {
+            document.documentElement.classList.add('dark');
+            localStorage.setItem('theme', 'dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+            localStorage.setItem('theme', 'light');
         }
-    }">
+    }
+}">
 
-    <div class="min-h-screen flex bg-slate-100 dark:bg-slate-950 relative transition-colors duration-200">
+    <div class="min-h-screen flex relative transition-colors duration-200">
 
         <!-- ================= SIDEBAR NAVIGASI ================= -->
         <aside x-show="sidebarOpen" x-transition:enter="transition ease-out duration-200"
             x-transition:enter-start="-translate-x-full opacity-0" x-transition:enter-end="translate-x-0 opacity-100"
             x-transition:leave="transition ease-in duration-150" x-transition:leave-start="translate-x-0 opacity-100"
             x-transition:leave-end="-translate-x-full opacity-0"
-            class="w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col justify-between shrink-0 sticky top-0 h-screen z-40 shadow-xl transition-colors duration-200">
+            class="w-64 border-r flex flex-col justify-between shrink-0 sticky top-0 h-screen z-40 shadow-xl transition-colors duration-200">
 
             <div>
                 <!-- Brand Logo & Tutup Mobile -->
-                <div
-                    class="h-16 flex items-center justify-between px-5 border-b border-slate-200 dark:border-slate-800">
+                <div class="h-16 flex items-center justify-between px-5 border-b">
                     <a href="{{ Auth::user()?->isAdmin() ? route('admin.dashboard') : route('dashboard') }}"
                         class="flex items-center gap-3">
                         <div
@@ -91,8 +181,8 @@
                             AS
                         </div>
                         <div>
-                            <div class="text-sm font-extrabold tracking-wider text-slate-900 dark:text-white">
-                                ABSOLUTE<span class="text-indigo-600 dark:text-indigo-400">STORE</span></div>
+                            <div class="text-sm font-extrabold tracking-wider">ABSOLUTE<span
+                                    class="text-indigo-600 dark:text-indigo-400">STORE</span></div>
                             <div
                                 class="text-[9px] uppercase tracking-widest text-slate-400 dark:text-slate-500 font-bold">
                                 {{ Auth::user()?->isAdmin() ? 'Control Panel' : 'Member Portal' }}
@@ -119,7 +209,7 @@
                                 class="px-3 text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 block mb-2">Utama</span>
                             <div class="space-y-1">
                                 <a href="{{ route('admin.dashboard') }}"
-                                    class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition {{ request()->routeIs('admin.dashboard') ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30' : 'text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60' }}">
+                                    class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition {{ request()->routeIs('admin.dashboard') ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30' : 'hover:bg-slate-100 dark:hover:bg-slate-800/60' }}">
                                     <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor"
                                         viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -136,7 +226,7 @@
                                 class="px-3 text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 block mb-2">Manajemen</span>
                             <div class="space-y-1">
                                 <a href="{{ route('admin.products.index') }}"
-                                    class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition {{ request()->routeIs('admin.products.*') ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30' : 'text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60' }}">
+                                    class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition {{ request()->routeIs('admin.products.*') ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30' : 'hover:bg-slate-100 dark:hover:bg-slate-800/60' }}">
                                     <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor"
                                         viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -146,7 +236,7 @@
                                 </a>
 
                                 <a href="{{ route('admin.promocodes.index') }}"
-                                    class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition {{ request()->routeIs('admin.promocodes.*') ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30' : 'text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60' }}">
+                                    class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition {{ request()->routeIs('admin.promocodes.*') ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30' : 'hover:bg-slate-100 dark:hover:bg-slate-800/60' }}">
                                     <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor"
                                         viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -156,7 +246,7 @@
                                 </a>
 
                                 <a href="{{ route('admin.payments.index') }}"
-                                    class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition {{ request()->routeIs('admin.payments.*') ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30' : 'text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60' }}">
+                                    class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition {{ request()->routeIs('admin.payments.*') ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30' : 'hover:bg-slate-100 dark:hover:bg-slate-800/60' }}">
                                     <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor"
                                         viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -166,7 +256,7 @@
                                 </a>
 
                                 <a href="{{ route('admin.promotions.index') }}"
-                                    class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition {{ request()->routeIs('admin.promotions.*') ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30' : 'text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60' }}">
+                                    class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition {{ request()->routeIs('admin.promotions.*') ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30' : 'hover:bg-slate-100 dark:hover:bg-slate-800/60' }}">
                                     <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor"
                                         viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -185,7 +275,7 @@
                                     & Sistem</span>
                                 <div class="space-y-1">
                                     <a href="{{ route('admin.users.index') }}"
-                                        class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition {{ request()->routeIs('admin.users.*') ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30' : 'text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60' }}">
+                                        class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition {{ request()->routeIs('admin.users.*') ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30' : 'hover:bg-slate-100 dark:hover:bg-slate-800/60' }}">
                                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor"
                                             viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -195,7 +285,7 @@
                                     </a>
 
                                     <a href="{{ route('admin.audit-logs.index') }}"
-                                        class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition {{ request()->routeIs('admin.audit-logs.*') ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30' : 'text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60' }}">
+                                        class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition {{ request()->routeIs('admin.audit-logs.*') ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30' : 'hover:bg-slate-100 dark:hover:bg-slate-800/60' }}">
                                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor"
                                             viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -213,7 +303,7 @@
                                 class="px-3 text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 block mb-2">Member</span>
                             <div class="space-y-1">
                                 <a href="{{ route('dashboard') }}"
-                                    class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition {{ request()->routeIs('dashboard') ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30' : 'text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60' }}">
+                                    class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition {{ request()->routeIs('dashboard') ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30' : 'hover:bg-slate-100 dark:hover:bg-slate-800/60' }}">
                                     <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor"
                                         viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -222,7 +312,7 @@
                                     <span>Dashboard & Pesanan</span>
                                 </a>
                                 <a href="{{ route('home') }}"
-                                    class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60 transition">
+                                    class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold hover:bg-slate-100 dark:hover:bg-slate-800/60 transition">
                                     <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor"
                                         viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -240,7 +330,7 @@
                             class="px-3 text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 block mb-2">Toko</span>
                         <div class="space-y-1">
                             <a href="{{ route('order.tracking') }}" target="_blank"
-                                class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/40 transition">
+                                class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold hover:bg-slate-100 dark:hover:bg-slate-800/40 transition">
                                 <span class="flex items-center gap-3">
                                     <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor"
                                         viewBox="0 0 24 24">
@@ -252,7 +342,7 @@
                                 <span class="text-[10px] text-slate-400">↗</span>
                             </a>
                             <a href="{{ route('home') }}" target="_blank"
-                                class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/40 transition">
+                                class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold hover:bg-slate-100 dark:hover:bg-slate-800/40 transition">
                                 <span class="flex items-center gap-3">
                                     <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor"
                                         viewBox="0 0 24 24">
@@ -270,15 +360,14 @@
             </div>
 
             <!-- Footer Sidebar -->
-            <div class="p-3 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60">
+            <div class="p-3 border-t">
                 <div class="flex items-center gap-2.5">
                     <div
                         class="h-8 w-8 rounded-full bg-gradient-to-tr from-indigo-600 to-cyan-500 flex items-center justify-center text-white font-bold text-xs shadow-md shrink-0">
                         {{ strtoupper(substr(Auth::user()->name, 0, 2)) }}
                     </div>
                     <div class="overflow-hidden flex-1">
-                        <span
-                            class="block text-xs font-bold text-slate-900 dark:text-white truncate">{{ Auth::user()->name }}</span>
+                        <span class="block text-xs font-bold truncate">{{ Auth::user()->name }}</span>
                         <span
                             class="block text-[9px] uppercase font-mono font-bold text-purple-600 dark:text-purple-400 truncate">
                             {{ Auth::user()->role }}
@@ -289,16 +378,16 @@
         </aside>
 
         <!-- ================= KONTEN UTAMA KANAN ================= -->
-        <div class="flex-1 flex flex-col min-w-0 bg-slate-100 dark:bg-slate-950 transition-colors duration-200">
+        <div class="flex-1 flex flex-col min-w-0 transition-colors duration-200">
 
             <!-- Header Top Bar -->
             <header
-                class="h-16 border-b border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md px-4 sm:px-6 flex items-center justify-between sticky top-0 z-40 transition-colors duration-200">
+                class="h-16 border-b px-4 sm:px-6 flex items-center justify-between sticky top-0 z-40 transition-colors duration-200">
 
                 <!-- Kiri: Toggle Sidebar & Judul -->
                 <div class="flex items-center gap-3">
                     <button type="button" @click="toggleSidebar()"
-                        class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition cursor-pointer"
+                        class="p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer"
                         title="Buka/Tutup Sidebar">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -306,7 +395,7 @@
                         </svg>
                     </button>
 
-                    <h1 class="text-xs font-black tracking-wider text-slate-800 dark:text-white uppercase">
+                    <h1 class="text-xs font-black tracking-wider uppercase">
                         @if (request()->routeIs('admin.dashboard'))
                             Dashboard Ringkasan
                         @elseif(request()->routeIs('admin.products.*'))
@@ -327,12 +416,12 @@
                     </h1>
                 </div>
 
-                <!-- Kanan: Toggle Mode & Avatar Profil Presisi -->
+                <!-- Kanan: Toggle Mode & Avatar Profil -->
                 <div class="flex items-center gap-3">
 
                     <!-- Quick Toggle Tema (Matahari / Bulan) -->
                     <button type="button" @click="toggleTheme()"
-                        class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:text-amber-500 dark:hover:text-amber-400 transition cursor-pointer"
+                        class="p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 hover:text-amber-500 transition cursor-pointer"
                         :title="isDark ? 'Beralih ke Mode Terang' : 'Beralih ke Mode Gelap'">
                         <svg x-show="isDark" class="w-4 h-4" fill="none" stroke="currentColor"
                             viewBox="0 0 24 24">
@@ -351,7 +440,7 @@
                         <button type="button" @click="userMenuOpen = !userMenuOpen"
                             class="h-10 w-10 rounded-full ring-2 ring-indigo-500/30 hover:ring-indigo-500 bg-gradient-to-tr from-indigo-600 to-cyan-500 p-0.5 transition shadow-md flex items-center justify-center focus:outline-none cursor-pointer">
                             <div
-                                class="h-full w-full rounded-full bg-white dark:bg-slate-900 flex items-center justify-center text-xs font-black text-slate-800 dark:text-white transition">
+                                class="h-full w-full rounded-full bg-white dark:bg-slate-900 flex items-center justify-center text-xs font-black transition">
                                 {{ strtoupper(substr(Auth::user()->name, 0, 2)) }}
                             </div>
                         </button>
@@ -363,22 +452,21 @@
                             x-transition:leave="transition ease-in duration-100"
                             x-transition:leave-start="opacity-100 translate-y-0 scale-100"
                             x-transition:leave-end="opacity-0 translate-y-1 scale-95" style="display: none;"
-                            class="absolute right-0 top-full mt-2 w-64 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-2 shadow-2xl z-50 text-xs origin-top-right">
+                            class="absolute right-0 top-full mt-2 w-64 rounded-2xl card p-2 shadow-2xl z-50 text-xs origin-top-right">
 
                             <!-- Info Akun -->
                             <div class="p-3 border-b border-slate-100 dark:border-slate-800 mb-1">
+                                <span class="block font-bold truncate">{{ Auth::user()->name }}</span>
                                 <span
-                                    class="block font-bold text-slate-900 dark:text-white truncate">{{ Auth::user()->name }}</span>
-                                <span
-                                    class="block text-[11px] font-mono text-slate-500 dark:text-slate-400 truncate">{{ Auth::user()->email }}</span>
+                                    class="block text-[11px] font-mono text-slate-400 truncate">{{ Auth::user()->email }}</span>
 
                                 <div class="mt-2 flex items-center gap-1.5">
                                     <span
-                                        class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider {{ Auth::user()->isAdmin() ? 'bg-purple-500/10 dark:bg-purple-500/20 text-purple-600 dark:text-purple-300 border border-purple-500/20' : 'bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-300 border border-indigo-500/20' }}">
+                                        class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider {{ Auth::user()->isAdmin() ? 'bg-purple-500/10 text-purple-600 dark:text-purple-300 border border-purple-500/20' : 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-300 border border-indigo-500/20' }}">
                                         {{ Auth::user()->role }}
                                     </span>
                                     <span
-                                        class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+                                        class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
                                         {{ Auth::user()->tier ?? 'Member' }}
                                     </span>
                                 </div>
@@ -387,7 +475,7 @@
                             <!-- Menu Link Akun -->
                             <div class="space-y-0.5">
                                 <a href="{{ route('user.profile.show') }}"
-                                    class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 font-medium transition">
+                                    class="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition font-medium">
                                     <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor"
                                         viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -397,7 +485,7 @@
                                 </a>
 
                                 <a href="{{ route('user.profile.show') }}"
-                                    class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 font-medium transition">
+                                    class="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition font-medium">
                                     <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor"
                                         viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -409,7 +497,7 @@
                                 </a>
 
                                 <button type="button" @click="toggleTheme()"
-                                    class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 font-medium transition cursor-pointer">
+                                    class="w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition font-medium cursor-pointer">
                                     <span class="flex items-center gap-2.5">
                                         <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor"
                                             viewBox="0 0 24 24">
@@ -428,7 +516,7 @@
                                 <form method="POST" action="{{ route('logout') }}" x-data>
                                     @csrf
                                     <button type="submit"
-                                        class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-rose-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 font-bold transition text-left cursor-pointer">
+                                        class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 font-bold transition text-left cursor-pointer">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                             viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
