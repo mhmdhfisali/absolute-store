@@ -2,17 +2,19 @@
 
 namespace App\Services;
 
+use App\Models\ProductItem;
 use App\Models\Transaction;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class DigiflazzService
 {
   protected string $username;
   protected string $apiKey;
   protected string $baseUrl;
-  protected int $minBalanceAlert = 100000; // Batas minimal Rp 100.000
+  protected int $minBalanceAlert = 100000;
 
   public function __construct()
   {
@@ -22,7 +24,7 @@ class DigiflazzService
   }
 
   /**
-   * Cek Saldo Akun Digiflazz & trigger alert jika menipis
+   * Cek Saldo Akun Digiflazz
    */
   public function checkBalance(): int
   {
@@ -36,7 +38,6 @@ class DigiflazzService
       ]);
 
       $balance = (int) ($response->json('data.deposit') ?? 0);
-
       $this->evaluateBalanceThreshold($balance);
 
       return $balance;
@@ -47,7 +48,7 @@ class DigiflazzService
   }
 
   /**
-   * Evaluasi saldo dan kirim WhatsApp ke Admin jika tipis (Cooldown 3 Jam)
+   * Evaluasi saldo dan kirim alert WhatsApp ke Admin jika tipis
    */
   public function evaluateBalanceThreshold(int $balance): void
   {
@@ -69,7 +70,137 @@ class DigiflazzService
   }
 
   /**
-   * Kirim permintaan top-up game, pulsa, atau token PLN ke Digiflazz
+   * Cek username / Nickname Game & Validasi Akun Real-Time (Inquiry)
+   */
+  public function checkAccount(string $gameSlug, string $targetId, ?string $zoneId = null): array
+  {
+    $cleanId = trim($targetId);
+    $cleanZone = trim($zoneId ?? '');
+
+    if (empty($cleanId)) {
+      return ['status' => false, 'username' => null, 'message' => 'User ID wajib diisi.'];
+    }
+
+    // Mode Dev / Offline Fallback jika testing tanpa akun live Digiflazz
+    if (empty($this->username) || env('DIGIFLAZZ_MODE') !== 'production') {
+      return [
+        'status'   => true,
+        'username' => 'Player_' . substr($cleanId, 0, 5) . ($cleanZone ? " ({$cleanZone})" : ''),
+        'message'  => 'Akun terverifikasi (Dev Mode)'
+      ];
+    }
+
+    $customerNo = $cleanZone ? "{$cleanId}{$cleanZone}" : $cleanId;
+    $refId = 'INQ-' . strtoupper(Str::random(10));
+    $sign = md5($this->username . $this->apiKey . $refId);
+
+    try {
+      $response = Http::timeout(12)->post("{$this->baseUrl}/transaction", [
+        'commands'       => 'inq-pasca',
+        'username'       => $this->username,
+        'buyer_sku_code' => $gameSlug,
+        'customer_no'    => $customerNo,
+        'ref_id'         => $refId,
+        'sign'           => $sign,
+      ]);
+
+      $data = $response->json('data') ?? [];
+
+      if (!empty($data['customer_name'])) {
+        return [
+          'status'   => true,
+          'username' => $data['customer_name'],
+          'message'  => 'Akun ditemukan'
+        ];
+      }
+
+      return [
+        'status'   => false,
+        'username' => null,
+        'message'  => $data['message'] ?? 'ID Akun tidak ditemukan.'
+      ];
+    } catch (\Exception $e) {
+      Log::warning("Gagal validasi akun IGN [{$gameSlug} - {$customerNo}]: " . $e->getMessage());
+
+      return [
+        'status'   => false,
+        'username' => null,
+        'message'  => 'Server validasi sedang sibuk.'
+      ];
+    }
+  }
+
+  /**
+   * Sinkronisasi Daftar Harga & SKU dari Digiflazz
+   */
+  public function syncPriceList(int $defaultMarginFlat = 1500, float $defaultMarginPercent = 0.0): array
+  {
+    $sign = md5($this->username . $this->apiKey . 'pricelist');
+
+    try {
+      $response = Http::timeout(45)->post("{$this->baseUrl}/price-list", [
+        'cmd'      => 'prepaid',
+        'username' => $this->username,
+        'sign'     => $sign,
+      ]);
+
+      $priceListData = $response->json('data') ?? [];
+
+      if (empty($priceListData)) {
+        return [
+          'success' => false,
+          'message' => 'Gagal mengambil price list dari Digiflazz atau data kosong.',
+          'updated' => 0,
+        ];
+      }
+
+      $updatedCount = 0;
+      $digiItems = collect($priceListData)->keyBy('buyer_sku_code');
+      $localItems = ProductItem::all();
+
+      foreach ($localItems as $localItem) {
+        if ($digiItems->has($localItem->sku_code)) {
+          $digi = $digiItems->get($localItem->sku_code);
+
+          $costPrice = (int) ($digi['price'] ?? 0);
+          $isBuyerProductActive = (bool) ($digi['buyer_product_status'] ?? false);
+          $isSellerProductActive = (bool) ($digi['seller_product_status'] ?? false);
+          $isAvailable = $isBuyerProductActive && $isSellerProductActive;
+
+          $marginFromPercent = (int) round($costPrice * ($defaultMarginPercent / 100));
+          $newSellingPrice = $costPrice + $defaultMarginFlat + $marginFromPercent;
+          $newSellingPrice = (int) (ceil($newSellingPrice / 100) * 100);
+
+          $localItem->update([
+            'original_price' => $costPrice,
+            'selling_price'  => $newSellingPrice,
+            'is_available'   => $isAvailable,
+          ]);
+
+          $updatedCount++;
+        }
+      }
+
+      Log::info("Digiflazz Price List Synced: {$updatedCount} items updated.");
+
+      return [
+        'success' => true,
+        'message' => "Berhasil menyinkronkan {$updatedCount} item SKU dengan server Digiflazz.",
+        'updated' => $updatedCount,
+      ];
+    } catch (\Exception $e) {
+      Log::error('Digiflazz Sync Price List Error: ' . $e->getMessage());
+
+      return [
+        'success' => false,
+        'message' => 'Koneksi ke Digiflazz gagal: ' . $e->getMessage(),
+        'updated' => 0,
+      ];
+    }
+  }
+
+  /**
+   * Kirim permintaan transaksi top-up ke Digiflazz
    */
   public function processTransaction(Transaction $trx): array
   {
@@ -118,7 +249,6 @@ class DigiflazzService
         'provider_response' => ['error' => $e->getMessage()],
       ]);
 
-      // Beritahu pembeli dan admin jika terjadi kegagalan sistem
       $wa = app(WhatsAppService::class);
       $wa->sendOrderFailed($trx, 'Koneksi ke server provider terputus: ' . $e->getMessage());
       $wa->sendAdminOrderFailedAlert($trx, $e->getMessage());

@@ -2,7 +2,6 @@
 
 use App\Models\Transaction;
 use App\Services\DigiflazzService;
-use App\Services\WhatsAppService;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Log;
@@ -25,10 +24,17 @@ Schedule::call(function (DigiflazzService $digiflazz) {
 })->hourly()->name('check-digiflazz-balance')->withoutOverlapping();
 
 // ==========================================
-// 2. PENJADWALAN EXPIRE INVOICE KEDALUWARSA (TIAP 10 MENIT)
+// 2. SINKRONISASI HARGA & SKU OTOMATIS (SETIAP HARI PUKUL 03:00)
+// ==========================================
+Schedule::command('digiflazz:sync --margin-flat=1500')
+    ->dailyAt('03:00')
+    ->name('daily-sync-digiflazz-prices')
+    ->withoutOverlapping();
+
+// ==========================================
+// 3. EXPIRE INVOICE KEDALUWARSA (TIAP 10 MENIT)
 // ==========================================
 Schedule::call(function () {
-    // Cari invoice unpaid yang dibuat lebih dari 2 jam lalu
     $expiredCount = Transaction::where('payment_status', 'unpaid')
         ->where('created_at', '<', now()->subHours(2))
         ->update([

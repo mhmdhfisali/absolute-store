@@ -22,6 +22,9 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'role',
+        'balance',
+        'tier',
         'password',
     ];
 
@@ -40,12 +43,47 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            'password'          => 'hashed',
+            'balance'           => 'decimal:2',
         ];
     }
 
     public function transactions(): HasMany
     {
         return $this->hasMany(Transaction::class);
+    }
+
+    public function savedAccounts(): HasMany
+    {
+        return $this->hasMany(SavedAccount::class);
+    }
+
+    public function deposits(): HasMany
+    {
+        return $this->hasMany(Deposit::class);
+    }
+
+    /**
+     * Memeriksa apakah user memiliki hak akses Admin / Superadmin
+     */
+    public function isAdmin(): bool
+    {
+        return in_array($this->role, ['admin', 'superadmin']);
+    }
+
+    /**
+     * Memeriksa apakah user adalah Superadmin
+     */
+    public function isSuperAdmin(): bool
+    {
+        return $this->role === 'superadmin';
+    }
+
+    /**
+     * Memeriksa apakah user merupakan Reseller atau VIP
+     */
+    public function isReseller(): bool
+    {
+        return in_array($this->tier, ['reseller', 'vip']);
     }
 }

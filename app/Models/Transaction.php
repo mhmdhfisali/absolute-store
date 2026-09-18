@@ -51,4 +51,9 @@ class Transaction extends Model
     {
         return $this->belongsTo(PaymentMethod::class);
     }
+
+    public function promoCode()
+    {
+        return $this->belongsTo(\App\Models\PromoCode::class);
+    }
 }

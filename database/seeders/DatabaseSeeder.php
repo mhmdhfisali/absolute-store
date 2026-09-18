@@ -16,11 +16,12 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1. Akun Admin
-        User::firstOrCreate(
+        // 1. Akun Superadmin
+        User::updateOrCreate(
             ['email' => 'admin@absolutestore.id'],
             [
-                'name'     => 'Admin Absolute',
+                'name'     => 'Absolute Superadmin',
+                'role'     => 'superadmin',
                 'password' => Hash::make('password'),
             ]
         );
@@ -33,7 +34,7 @@ class DatabaseSeeder extends Seeder
         $catStreaming = Category::firstOrCreate(['slug' => 'streaming'], ['name' => 'Voucher Streaming', 'icon' => 'tv']);
         $catVoucher   = Category::firstOrCreate(['slug' => 'voucher-game'], ['name' => 'PC & Console Voucher', 'icon' => 'gift']);
 
-        // 3. Katalog Produk dengan Thumbnail Gambar Resmi
+        // 3. Katalog Produk
 
         // --- Mobile Legends ---
         $ml = Product::updateOrCreate(

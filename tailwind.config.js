@@ -11,14 +11,12 @@ export default {
         "./storage/framework/views/*.php",
         "./resources/views/**/*.blade.php",
     ],
-
     theme: {
         extend: {
             fontFamily: {
-                sans: ["Instrument Sans", ...defaultTheme.fontFamily.sans],
+                sans: ["Plus Jakarta Sans", ...defaultTheme.fontFamily.sans],
             },
         },
     },
-
     plugins: [forms, typography],
 };
