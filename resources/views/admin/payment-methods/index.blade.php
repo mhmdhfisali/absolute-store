@@ -10,13 +10,20 @@
             </div>
         @endif
 
-        <!-- Header -->
-        <div
-            class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-200 dark:border-slate-800">
+        <!-- Header Section -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-200 dark:border-slate-800">
             <div>
-                <h1 class="text-2xl font-black tracking-tight">Pengaturan Payment Gateway</h1>
-                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Kelola biaya admin tetap (flat), persentase
-                    fee, dan saluran pembayaran aktif untuk pelanggan.</p>
+                <div class="flex items-center gap-2.5">
+                    <h1 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+                        Metode Pembayaran
+                    </h1>
+                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
+                        Billing Gateway
+                    </span>
+                </div>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                    Kelola biaya admin flat, persentase fee, dan saluran pembayaran aktif untuk pelanggan.
+                </p>
             </div>
             <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl card text-xs font-semibold">
                 <span class="h-2 w-2 rounded-full bg-indigo-500"></span>

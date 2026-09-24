@@ -20,19 +20,19 @@ class DatabaseSeeder extends Seeder
         User::updateOrCreate(
             ['email' => 'admin@absolutestore.id'],
             [
-                'name'     => 'Absolute Superadmin',
-                'role'     => 'superadmin',
+                'name' => 'Absolute Superadmin',
+                'role' => 'superadmin',
                 'password' => Hash::make('password'),
             ]
         );
 
         // 2. Kategori Layanan
-        $catGames     = Category::firstOrCreate(['slug' => 'games'], ['name' => 'Game Populer', 'icon' => 'gamepad']);
-        $catPulsa     = Category::firstOrCreate(['slug' => 'pulsa-data'], ['name' => 'Pulsa & Paket Data', 'icon' => 'smartphone']);
-        $catPln       = Category::firstOrCreate(['slug' => 'pln'], ['name' => 'Token & Tagihan PLN', 'icon' => 'zap']);
-        $catEwallet   = Category::firstOrCreate(['slug' => 'ewallet'], ['name' => 'Top Up E-Wallet', 'icon' => 'wallet']);
+        $catGames = Category::firstOrCreate(['slug' => 'games'], ['name' => 'Game Populer', 'icon' => 'gamepad']);
+        $catPulsa = Category::firstOrCreate(['slug' => 'pulsa-data'], ['name' => 'Pulsa & Paket Data', 'icon' => 'smartphone']);
+        $catPln = Category::firstOrCreate(['slug' => 'pln'], ['name' => 'Token & Tagihan PLN', 'icon' => 'zap']);
+        $catEwallet = Category::firstOrCreate(['slug' => 'ewallet'], ['name' => 'Top Up E-Wallet', 'icon' => 'wallet']);
         $catStreaming = Category::firstOrCreate(['slug' => 'streaming'], ['name' => 'Voucher Streaming', 'icon' => 'tv']);
-        $catVoucher   = Category::firstOrCreate(['slug' => 'voucher-game'], ['name' => 'PC & Console Voucher', 'icon' => 'gift']);
+        $catVoucher = Category::firstOrCreate(['slug' => 'voucher-game'], ['name' => 'PC & Console Voucher', 'icon' => 'gift']);
 
         // 3. Katalog Produk
 
@@ -41,10 +41,10 @@ class DatabaseSeeder extends Seeder
             ['slug' => 'mobile-legends'],
             [
                 'category_id' => $catGames->id,
-                'name'        => 'Mobile Legends: Bang Bang',
-                'thumbnail'   => 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80',
-                'input_type'  => 'id_and_zone',
-                'is_active'   => true,
+                'name' => 'Mobile Legends: Bang Bang',
+                'thumbnail' => 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80',
+                'input_type' => 'id_and_zone',
+                'is_active' => true,
             ]
         );
         $this->createItems($ml->id, [
@@ -60,10 +60,10 @@ class DatabaseSeeder extends Seeder
             ['slug' => 'free-fire'],
             [
                 'category_id' => $catGames->id,
-                'name'        => 'Free Fire Max',
-                'thumbnail'   => 'https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=800&q=80',
-                'input_type'  => 'id_only',
-                'is_active'   => true,
+                'name' => 'Free Fire Max',
+                'thumbnail' => 'https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=800&q=80',
+                'input_type' => 'id_only',
+                'is_active' => true,
             ]
         );
         $this->createItems($ff->id, [
@@ -78,10 +78,10 @@ class DatabaseSeeder extends Seeder
             ['slug' => 'genshin-impact'],
             [
                 'category_id' => $catGames->id,
-                'name'        => 'Genshin Impact (Genesis)',
-                'thumbnail'   => 'https://images.unsplash.com/photo-1579373903781-fd5c0c30c4cd?auto=format&fit=crop&w=800&q=80',
-                'input_type'  => 'id_and_zone',
-                'is_active'   => true,
+                'name' => 'Genshin Impact (Genesis)',
+                'thumbnail' => 'https://images.unsplash.com/photo-1579373903781-fd5c0c30c4cd?auto=format&fit=crop&w=800&q=80',
+                'input_type' => 'id_and_zone',
+                'is_active' => true,
             ]
         );
         $this->createItems($genshin->id, [
@@ -95,10 +95,10 @@ class DatabaseSeeder extends Seeder
             ['slug' => 'telkomsel-reguler'],
             [
                 'category_id' => $catPulsa->id,
-                'name'        => 'Telkomsel Reguler & Data',
-                'thumbnail'   => 'https://images.unsplash.com/photo-1580910051074-3eb694886505?auto=format&fit=crop&w=800&q=80',
-                'input_type'  => 'phone_number',
-                'is_active'   => true,
+                'name' => 'Telkomsel Reguler & Data',
+                'thumbnail' => 'https://images.unsplash.com/photo-1580910051074-3eb694886505?auto=format&fit=crop&w=800&q=80',
+                'input_type' => 'phone_number',
+                'is_active' => true,
             ]
         );
         $this->createItems($tsel->id, [
@@ -113,10 +113,10 @@ class DatabaseSeeder extends Seeder
             ['slug' => 'indosat-im3'],
             [
                 'category_id' => $catPulsa->id,
-                'name'        => 'Indosat IM3 Ooredoo',
-                'thumbnail'   => 'https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=800&q=80',
-                'input_type'  => 'phone_number',
-                'is_active'   => true,
+                'name' => 'Indosat IM3 Ooredoo',
+                'thumbnail' => 'https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=800&q=80',
+                'input_type' => 'phone_number',
+                'is_active' => true,
             ]
         );
         $this->createItems($isat->id, [
@@ -130,10 +130,10 @@ class DatabaseSeeder extends Seeder
             ['slug' => 'pln-prepaid'],
             [
                 'category_id' => $catPln->id,
-                'name'        => 'Token Listrik PLN Prabayar',
-                'thumbnail'   => 'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=800&q=80',
-                'input_type'  => 'meter_number',
-                'is_active'   => true,
+                'name' => 'Token Listrik PLN Prabayar',
+                'thumbnail' => 'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=800&q=80',
+                'input_type' => 'meter_number',
+                'is_active' => true,
             ]
         );
         $this->createItems($pln->id, [
@@ -148,10 +148,10 @@ class DatabaseSeeder extends Seeder
             ['slug' => 'topup-dana'],
             [
                 'category_id' => $catEwallet->id,
-                'name'        => 'Saldo DANA Dompet Digital',
-                'thumbnail'   => 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&w=800&q=80',
-                'input_type'  => 'phone_number',
-                'is_active'   => true,
+                'name' => 'Saldo DANA Dompet Digital',
+                'thumbnail' => 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&w=800&q=80',
+                'input_type' => 'phone_number',
+                'is_active' => true,
             ]
         );
         $this->createItems($dana->id, [
@@ -165,10 +165,10 @@ class DatabaseSeeder extends Seeder
             ['slug' => 'topup-gopay'],
             [
                 'category_id' => $catEwallet->id,
-                'name'        => 'Saldo GoPay Driver & Customer',
-                'thumbnail'   => 'https://images.unsplash.com/photo-1556742049-0a67c5574f73?auto=format&fit=crop&w=800&q=80',
-                'input_type'  => 'phone_number',
-                'is_active'   => true,
+                'name' => 'Saldo GoPay Driver & Customer',
+                'thumbnail' => 'https://images.unsplash.com/photo-1556742049-0a67c5574f73?auto=format&fit=crop&w=800&q=80',
+                'input_type' => 'phone_number',
+                'is_active' => true,
             ]
         );
         $this->createItems($gopay->id, [
@@ -181,10 +181,10 @@ class DatabaseSeeder extends Seeder
             ['slug' => 'spotify-premium'],
             [
                 'category_id' => $catStreaming->id,
-                'name'        => 'Spotify Premium Individual',
-                'thumbnail'   => 'https://images.unsplash.com/photo-1614680376593-902f749f7ffc?auto=format&fit=crop&w=800&q=80',
-                'input_type'  => 'phone_number',
-                'is_active'   => true,
+                'name' => 'Spotify Premium Individual',
+                'thumbnail' => 'https://images.unsplash.com/photo-1614680376593-902f749f7ffc?auto=format&fit=crop&w=800&q=80',
+                'input_type' => 'phone_number',
+                'is_active' => true,
             ]
         );
         $this->createItems($spotify->id, [
@@ -197,10 +197,10 @@ class DatabaseSeeder extends Seeder
             ['slug' => 'netflix-voucher'],
             [
                 'category_id' => $catStreaming->id,
-                'name'        => 'Netflix Gift Card IDR',
-                'thumbnail'   => 'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?auto=format&fit=crop&w=800&q=80',
-                'input_type'  => 'phone_number',
-                'is_active'   => true,
+                'name' => 'Netflix Gift Card IDR',
+                'thumbnail' => 'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?auto=format&fit=crop&w=800&q=80',
+                'input_type' => 'phone_number',
+                'is_active' => true,
             ]
         );
         $this->createItems($netflix->id, [
@@ -213,10 +213,10 @@ class DatabaseSeeder extends Seeder
             ['slug' => 'steam-wallet-code'],
             [
                 'category_id' => $catVoucher->id,
-                'name'        => 'Steam Wallet Code (IDR)',
-                'thumbnail'   => 'https://images.unsplash.com/photo-1612287233261-26c7104f32c3?auto=format&fit=crop&w=800&q=80',
-                'input_type'  => 'phone_number',
-                'is_active'   => true,
+                'name' => 'Steam Wallet Code (IDR)',
+                'thumbnail' => 'https://images.unsplash.com/photo-1612287233261-26c7104f32c3?auto=format&fit=crop&w=800&q=80',
+                'input_type' => 'phone_number',
+                'is_active' => true,
             ]
         );
         $this->createItems($steam->id, [
@@ -229,44 +229,44 @@ class DatabaseSeeder extends Seeder
         PaymentMethod::firstOrCreate(
             ['code' => 'QRIS'],
             [
-                'name'             => 'QRIS (Semua E-Wallet / Mobile Banking)',
+                'name' => 'QRIS (Semua E-Wallet / Mobile Banking)',
                 'channel_category' => 'qris',
-                'fee_flat'         => 750,
-                'fee_percent'      => 0.7,
-                'is_active'        => true,
+                'fee_flat' => 750,
+                'fee_percent' => 0.7,
+                'is_active' => true,
             ]
         );
 
         PaymentMethod::firstOrCreate(
             ['code' => 'BCAVA'],
             [
-                'name'             => 'BCA Virtual Account',
+                'name' => 'BCA Virtual Account',
                 'channel_category' => 'va',
-                'fee_flat'         => 2500,
-                'fee_percent'      => 0,
-                'is_active'        => true,
+                'fee_flat' => 2500,
+                'fee_percent' => 0,
+                'is_active' => true,
             ]
         );
 
         PaymentMethod::firstOrCreate(
             ['code' => 'BRIVA'],
             [
-                'name'             => 'BRI Virtual Account',
+                'name' => 'BRI Virtual Account',
                 'channel_category' => 'va',
-                'fee_flat'         => 2500,
-                'fee_percent'      => 0,
-                'is_active'        => true,
+                'fee_flat' => 2500,
+                'fee_percent' => 0,
+                'is_active' => true,
             ]
         );
 
         PaymentMethod::firstOrCreate(
             ['code' => 'MANDIRIVA'],
             [
-                'name'             => 'Mandiri Livin VA',
+                'name' => 'Mandiri Livin VA',
                 'channel_category' => 'va',
-                'fee_flat'         => 2500,
-                'fee_percent'      => 0,
-                'is_active'        => true,
+                'fee_flat' => 2500,
+                'fee_percent' => 0,
+                'is_active' => true,
             ]
         );
 
@@ -274,18 +274,18 @@ class DatabaseSeeder extends Seeder
         Banner::firstOrCreate(
             ['title' => 'Promo Spesial Weekly Diamond Pass MLBB'],
             [
-                'image_url'  => 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1600&q=80',
+                'image_url' => 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1600&q=80',
                 'target_url' => url('/order/mobile-legends'),
-                'is_active'  => true,
+                'is_active' => true,
             ]
         );
 
         Banner::firstOrCreate(
             ['title' => 'Flash Sale Token PLN & Saldo E-Wallet'],
             [
-                'image_url'  => 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1600&q=80',
+                'image_url' => 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1600&q=80',
                 'target_url' => url('/order/pln-prepaid'),
-                'is_active'  => true,
+                'is_active' => true,
             ]
         );
 
@@ -303,11 +303,11 @@ class DatabaseSeeder extends Seeder
             ProductItem::firstOrCreate(
                 ['sku_code' => $item['sku']],
                 [
-                    'product_id'     => $productId,
-                    'name'           => $item['name'],
+                    'product_id' => $productId,
+                    'name' => $item['name'],
                     'original_price' => $item['cost'],
-                    'selling_price'  => $item['price'],
-                    'is_available'   => true,
+                    'selling_price' => $item['price'],
+                    'is_available' => true,
                 ]
             );
         }

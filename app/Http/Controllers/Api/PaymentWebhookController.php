@@ -9,6 +9,7 @@ use App\Services\WhatsAppService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class PaymentWebhookController extends Controller
 {
@@ -24,7 +25,7 @@ class PaymentWebhookController extends Controller
         $json = $request->getContent();
         $privateKey = config('services.tripay.private_key') ?? env('TRIPAY_PRIVATE_KEY');
 
-        if (!$callbackSignature || !$privateKey) {
+        if (! $callbackSignature || ! $privateKey) {
             return response()->json([
                 'success' => false,
                 'message' => 'Signature or private key not configured',
@@ -33,9 +34,9 @@ class PaymentWebhookController extends Controller
 
         $signature = hash_hmac('sha256', $json, $privateKey);
 
-        if (!hash_equals($signature, (string) $callbackSignature)) {
+        if (! hash_equals($signature, (string) $callbackSignature)) {
             Log::warning('Tripay webhook invalid signature attempt', [
-                'received'   => $callbackSignature,
+                'received' => $callbackSignature,
                 'calculated' => $signature,
             ]);
 
@@ -48,7 +49,7 @@ class PaymentWebhookController extends Controller
         $event = $request->header('X-Callback-Event');
         $data = json_decode($json, true);
 
-        if ($event !== 'payment_status' || !isset($data['merchant_ref'])) {
+        if ($event !== 'payment_status' || ! isset($data['merchant_ref'])) {
             return response()->json([
                 'success' => true,
                 'message' => 'Ignored event',
@@ -60,7 +61,7 @@ class PaymentWebhookController extends Controller
             ->where('invoice_number', $invoiceNumber)
             ->first();
 
-        if (!$trx) {
+        if (! $trx) {
             return response()->json([
                 'success' => false,
                 'message' => 'Transaction not found',
@@ -79,7 +80,7 @@ class PaymentWebhookController extends Controller
         switch ($tripayStatus) {
             case 'PAID':
                 $trx->update([
-                    'payment_status'  => 'paid',
+                    'payment_status' => 'paid',
                     'delivery_status' => 'processing',
                 ]);
 
@@ -89,7 +90,7 @@ class PaymentWebhookController extends Controller
                 } else {
                     $trx->update([
                         'delivery_status' => 'success',
-                        'serial_number'   => 'AS-AUTO-' . strtoupper(\Illuminate\Support\Str::random(16)),
+                        'serial_number' => 'AS-AUTO-'.strtoupper(Str::random(16)),
                         'provider_response' => $data,
                     ]);
                     $waService->sendPaymentSuccess($trx);
@@ -98,16 +99,16 @@ class PaymentWebhookController extends Controller
 
             case 'EXPIRED':
                 $trx->update([
-                    'payment_status'    => 'expired',
-                    'delivery_status'   => 'failed',
+                    'payment_status' => 'expired',
+                    'delivery_status' => 'failed',
                     'provider_response' => $data,
                 ]);
                 break;
 
             case 'FAILED':
                 $trx->update([
-                    'payment_status'    => 'failed',
-                    'delivery_status'   => 'failed',
+                    'payment_status' => 'failed',
+                    'delivery_status' => 'failed',
                     'provider_response' => $data,
                 ]);
                 break;
@@ -130,8 +131,8 @@ class PaymentWebhookController extends Controller
         $secret = env('DIGIFLAZZ_WEBHOOK_SECRET', '');
         $postData = $request->getContent();
 
-        if (!empty($secret)) {
-            $signature = 'sha1=' . hash_hmac('sha1', $postData, $secret);
+        if (! empty($secret)) {
+            $signature = 'sha1='.hash_hmac('sha1', $postData, $secret);
             if ($request->header('X-Hub-Signature') !== $signature) {
                 return response()->json(['message' => 'Invalid Digiflazz signature'], 403);
             }
@@ -140,7 +141,7 @@ class PaymentWebhookController extends Controller
         $data = $request->json('data') ?? [];
         $refId = $data['ref_id'] ?? null;
 
-        if (!$refId) {
+        if (! $refId) {
             return response()->json(['message' => 'Ref ID missing'], 400);
         }
 
@@ -155,14 +156,14 @@ class PaymentWebhookController extends Controller
 
             if ($status === 'sukses') {
                 $trx->update([
-                    'delivery_status'   => 'success',
-                    'serial_number'     => $sn ?: $trx->serial_number,
+                    'delivery_status' => 'success',
+                    'serial_number' => $sn ?: $trx->serial_number,
                     'provider_response' => $data,
                 ]);
                 $waService->sendPaymentSuccess($trx);
             } elseif ($status === 'gagal') {
                 $trx->update([
-                    'delivery_status'   => 'failed',
+                    'delivery_status' => 'failed',
                     'provider_response' => $data,
                 ]);
                 $waService->sendOrderFailed($trx, $message ?: 'Ditolak operator');

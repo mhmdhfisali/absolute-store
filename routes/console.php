@@ -15,12 +15,12 @@ Artisan::command('inspire', function () {
 // 1. PENJADWALAN CEK SALDO DIGIFLAZZ (TIAP JAM)
 // ==========================================
 Schedule::call(function (DigiflazzService $digiflazz) {
-    if (!env('DIGIFLAZZ_USERNAME')) {
+    if (! env('DIGIFLAZZ_USERNAME')) {
         return;
     }
 
     $balance = $digiflazz->checkBalance();
-    Log::info("[Scheduler] Pengecekan Saldo Digiflazz: Rp " . number_format($balance, 0, ',', '.'));
+    Log::info('[Scheduler] Pengecekan Saldo Digiflazz: Rp '.number_format($balance, 0, ',', '.'));
 })->hourly()->name('check-digiflazz-balance')->withoutOverlapping();
 
 // ==========================================
@@ -38,7 +38,7 @@ Schedule::call(function () {
     $expiredCount = Transaction::where('payment_status', 'unpaid')
         ->where('created_at', '<', now()->subHours(2))
         ->update([
-            'payment_status'  => 'expired',
+            'payment_status' => 'expired',
             'delivery_status' => 'failed',
         ]);
 

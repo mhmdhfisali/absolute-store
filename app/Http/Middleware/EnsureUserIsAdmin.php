@@ -11,7 +11,7 @@ class EnsureUserIsAdmin
     public function handle(Request $request, Closure $next): Response
     {
         // Pastikan login dan memiliki role admin atau superadmin
-        if (!$request->user() || !$request->user()->isAdmin()) {
+        if (! $request->user() || ! $request->user()->isAdmin()) {
             abort(403, 'Akses Ditolak: Anda tidak memiliki izin untuk mengakses Console Admin.');
         }
 

@@ -106,21 +106,55 @@
             </div>
         </div>
 
-        <!-- Tombol Simulasi Pembayaran (Hanya tampil jika unpaid) -->
-        @if ($transaction->payment_status === 'unpaid')
-            <div class="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3">
-                <span class="text-[11px] text-slate-500 italic">
-                    * Halaman ini otomatis mendeteksi ketika pembayaran sudah masuk.
-                </span>
+        <!-- Aksi & Cetak Struk Resmi -->
+        <div class="pt-4 border-t border-slate-800 flex flex-wrap items-center justify-between gap-3"
+            x-data="{ copied: false }">
+            <div class="flex flex-wrap items-center gap-2">
+                @if ($transaction->payment_status === 'paid')
+                    <a href="{{ route('order.invoice.print', $transaction->invoice_number) }}" target="_blank"
+                        class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-lg shadow-indigo-600/30 transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                        </svg>
+                        Cetak Struk Resmi (Thermal / PDF)
+                    </a>
+
+                    <a href="https://api.whatsapp.com/send?text={{ urlencode('Halo, berikut bukti transaksi Absolute Store untuk invoice #' . $transaction->invoice_number . ': ' . route('order.invoice', $transaction->invoice_number)) }}"
+                        target="_blank"
+                        class="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 font-bold text-xs transition">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/>
+                        </svg>
+                        Bagikan WhatsApp
+                    </a>
+                @endif
+
+                <button type="button"
+                    @click="navigator.clipboard.writeText(window.location.href); copied = true; setTimeout(() => copied = false, 2500)"
+                    class="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" x-show="!copied">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                    </svg>
+                    <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" x-show="copied" style="display: none;">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span x-text="copied ? 'Tersalin ke Clipboard!' : 'Salin Tautan'">Salin Tautan</span>
+                </button>
+            </div>
+
+            <!-- Tombol Simulasi Pembayaran (Hanya tampil jika unpaid) -->
+            @if ($transaction->payment_status === 'unpaid')
                 <form action="{{ route('payment.simulate', $transaction->invoice_number) }}" method="POST">
                     @csrf
                     <button type="submit"
-                        class="px-4 py-2 rounded-xl bg-emerald-600/20 hover:bg-emerald-600 hover:text-white border border-emerald-500/30 text-emerald-400 font-bold text-xs transition">
+                        class="px-4 py-2.5 rounded-xl bg-emerald-600/20 hover:bg-emerald-600 hover:text-white border border-emerald-500/30 text-emerald-400 font-bold text-xs transition">
                         Simulasi Bayar Instan
                     </button>
                 </form>
-            </div>
-        @endif
+            @endif
+        </div>
 
     </div>
 </div>

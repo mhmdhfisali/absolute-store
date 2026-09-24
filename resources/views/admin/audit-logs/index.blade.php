@@ -1,13 +1,20 @@
 <x-app-layout>
     <div class="space-y-6 max-w-7xl mx-auto" x-data="{ payloadModal: false, selectedPayload: null }">
 
-        <!-- Header -->
-        <div
-            class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
+        <!-- Header Section -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-200 dark:border-slate-800">
             <div>
-                <h1 class="text-2xl font-black tracking-tight">Audit Activity Logs</h1>
-                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Rekam jejak seluruh aktivitas administratif,
-                    perubahan role, pengeditan saldo, harga, dan proses retry transaksi.</p>
+                <div class="flex items-center gap-2.5">
+                    <h1 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+                        Audit Log & Keamanan
+                    </h1>
+                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20">
+                        Security Log
+                    </span>
+                </div>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                    Rekam jejak seluruh aktivitas administratif, perubahan role, pengeditan saldo, harga, dan proses retry transaksi.
+                </p>
             </div>
 
             <!-- Search Form -->

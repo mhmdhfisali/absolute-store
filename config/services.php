@@ -35,4 +35,19 @@ return [
         ],
     ],
 
+    'tripay' => [
+        'api_key' => env('TRIPAY_API_KEY', ''),
+        'private_key' => env('TRIPAY_PRIVATE_KEY', ''),
+        'merchant_code' => env('TRIPAY_MERCHANT_CODE', ''),
+        'mode' => env('TRIPAY_MODE', 'sandbox'),
+    ],
+
+    'digiflazz' => [
+        'username' => env('DIGIFLAZZ_USERNAME', ''),
+        'api_key' => env('DIGIFLAZZ_API_KEY', ''),
+        'webhook_secret' => env('DIGIFLAZZ_WEBHOOK_SECRET', ''),
+        'webhook_ips' => env('DIGIFLAZZ_WEBHOOK_IPS', ''),
+        'mode' => env('DIGIFLAZZ_MODE', 'development'),
+    ],
+
 ];

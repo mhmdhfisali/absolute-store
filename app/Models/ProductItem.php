@@ -29,6 +29,21 @@ class ProductItem extends Model
         ];
     }
 
+    public function getPriceAttribute(): float
+    {
+        return (float) ($this->attributes['selling_price'] ?? 0);
+    }
+
+    public function setPriceAttribute($value): void
+    {
+        $this->attributes['selling_price'] = $value;
+    }
+
+    public function getResellerPriceAttribute(): float
+    {
+        return (float) ($this->attributes['reseller_price'] ?? ($this->attributes['selling_price'] ?? 0));
+    }
+
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);

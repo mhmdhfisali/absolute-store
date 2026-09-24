@@ -2,11 +2,12 @@
 
 namespace App\Models;
 
-use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
@@ -22,9 +23,18 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'phone',
+        'discord_tag',
+        'bio',
+        'notification_preferences',
+        'webhook_url',
         'role',
         'balance',
         'tier',
+        'referral_code',
+        'referred_by_id',
+        'is_banned',
+        'ban_reason',
         'password',
     ];
 
@@ -43,14 +53,21 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
-            'password'          => 'hashed',
-            'balance'           => 'decimal:2',
+            'password' => 'hashed',
+            'balance' => 'decimal:2',
+            'is_banned' => 'boolean',
+            'notification_preferences' => 'array',
         ];
     }
 
     public function transactions(): HasMany
     {
         return $this->hasMany(Transaction::class);
+    }
+
+    public function walletTransactions(): HasMany
+    {
+        return $this->hasMany(WalletTransaction::class);
     }
 
     public function savedAccounts(): HasMany
@@ -61,6 +78,68 @@ class User extends Authenticatable
     public function deposits(): HasMany
     {
         return $this->hasMany(Deposit::class);
+    }
+
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    public function affiliateEarnings(): HasMany
+    {
+        return $this->hasMany(AffiliateEarning::class, 'referrer_id');
+    }
+
+    public function downlines(): HasMany
+    {
+        return $this->hasMany(User::class, 'referred_by_id');
+    }
+
+    public function referrer(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'referred_by_id');
+    }
+
+    public function wishlists(): HasMany
+    {
+        return $this->hasMany(Wishlist::class);
+    }
+
+    public function userNotifications(): HasMany
+    {
+        return $this->hasMany(UserNotification::class);
+    }
+
+    public function unreadNotificationsCount(): int
+    {
+        return $this->userNotifications()->where('is_read', false)->count();
+    }
+
+    protected static function booted(): void
+    {
+        static::creating(function (User $user) {
+            if (empty($user->referral_code)) {
+                $user->referral_code = 'AS'.strtoupper(Str::random(6));
+            }
+        });
+    }
+
+    public function getReferralCodeAttribute($value): string
+    {
+        if (empty($value)) {
+            $value = 'AS'.strtoupper(Str::random(6));
+            $this->attributes['referral_code'] = $value;
+            if ($this->exists) {
+                $this->saveQuietly();
+            }
+        }
+
+        return $value;
+    }
+
+    public function isBanned(): bool
+    {
+        return (bool) $this->is_banned;
     }
 
     /**

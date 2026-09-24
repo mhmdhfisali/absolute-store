@@ -8,10 +8,15 @@ use App\Models\ProductItem;
 use App\Models\PromoCode;
 use App\Models\SavedAccount;
 use App\Models\Transaction;
+use App\Models\User;
+use App\Models\WalletTransaction;
+use App\Services\AffiliateService;
 use App\Services\DigiflazzService;
 use App\Services\WhatsAppService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Livewire\Attributes\Computed;
 use Livewire\Component;
 
 class OrderForm extends Component
@@ -19,20 +24,29 @@ class OrderForm extends Component
     public Product $product;
 
     public string $userId = '';
+
     public string $zoneId = '';
+
     public ?int $selectedItemId = null;
+
     public ?int $selectedPaymentId = null;
+
     public string $contactNumber = '';
 
     // State Validasi Nickname
     public ?string $validatedUsername = null;
+
     public ?string $usernameError = null;
 
     // State Kode Promo
     public string $promoInput = '';
+
     public ?PromoCode $appliedPromo = null;
+
     public int $discountValue = 0;
+
     public ?string $promoMessage = null;
+
     public ?string $promoError = null;
 
     // State Akun Tersimpan
@@ -40,7 +54,9 @@ class OrderForm extends Component
 
     public function mount(Product $product)
     {
-        $this->product = $product->load('items');
+        $this->product = $product->load(['category', 'items' => function ($q) {
+            $q->where('is_available', true)->orderBy('selling_price', 'asc');
+        }]);
         $this->selectedItemId = $this->product->items->first()?->id;
         $this->selectedPaymentId = PaymentMethod::where('is_active', true)->first()?->id;
 
@@ -65,7 +81,7 @@ class OrderForm extends Component
 
     public function applySavedAccount(int $savedAccountId)
     {
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             return;
         }
 
@@ -107,7 +123,7 @@ class OrderForm extends Component
         $digiflazz = app(DigiflazzService::class);
         $res = $digiflazz->checkAccount($this->product->slug, $id, $zone);
 
-        if ($res['status'] && !empty($res['username'])) {
+        if ($res['status'] && ! empty($res['username'])) {
             $this->validatedUsername = $res['username'];
             $this->usernameError = null;
         } else {
@@ -136,26 +152,30 @@ class OrderForm extends Component
 
         if (empty($code)) {
             $this->promoError = 'Masukkan kode promo terlebih dahulu.';
+
             return;
         }
 
         $promo = PromoCode::where('code', $code)->where('is_active', true)->first();
 
-        if (!$promo) {
+        if (! $promo) {
             $this->promoError = 'Kode promo tidak valid atau tidak ditemukan.';
             $this->resetPromo();
+
             return;
         }
 
         if ($promo->valid_until && now()->gt($promo->valid_until)) {
             $this->promoError = 'Masa berlaku kode promo ini sudah habis.';
             $this->resetPromo();
+
             return;
         }
 
         if ($promo->usage_limit !== null && $promo->used_count >= $promo->usage_limit) {
             $this->promoError = 'Kuota penggunaan kode promo ini sudah habis.';
             $this->resetPromo();
+
             return;
         }
 
@@ -163,14 +183,15 @@ class OrderForm extends Component
         $subtotal = $this->getItemPrice($item);
 
         if ($subtotal < $promo->min_transaction) {
-            $this->promoError = 'Minimal belanja untuk kupon ini adalah Rp ' . number_format($promo->min_transaction, 0, ',', '.');
+            $this->promoError = 'Minimal belanja untuk kupon ini adalah Rp '.number_format($promo->min_transaction, 0, ',', '.');
             $this->resetPromo();
+
             return;
         }
 
         $this->appliedPromo = $promo;
         $this->recalculateDiscount();
-        $this->promoMessage = 'Kupon ' . $promo->code . ' berhasil dipasang!';
+        $this->promoMessage = 'Kupon '.$promo->code.' berhasil dipasang!';
     }
 
     public function removePromo()
@@ -192,9 +213,11 @@ class OrderForm extends Component
      */
     protected function getItemPrice(?ProductItem $item): int
     {
-        if (!$item) return 0;
+        if (! $item) {
+            return 0;
+        }
 
-        if (Auth::check() && Auth::user()->isReseller() && !empty($item->reseller_price)) {
+        if (Auth::check() && Auth::user()->isReseller() && ! empty($item->reseller_price)) {
             return (int) $item->reseller_price;
         }
 
@@ -203,14 +226,16 @@ class OrderForm extends Component
 
     protected function recalculateDiscount()
     {
-        if (!$this->appliedPromo) {
+        if (! $this->appliedPromo) {
             $this->discountValue = 0;
+
             return;
         }
 
         $item = ProductItem::find($this->selectedItemId);
-        if (!$item) {
+        if (! $item) {
             $this->resetPromo();
+
             return;
         }
 
@@ -219,18 +244,20 @@ class OrderForm extends Component
         if ($price < $this->appliedPromo->min_transaction) {
             $this->promoError = 'Nominal item tidak memenuhi syarat minimum kupon.';
             $this->resetPromo();
+
             return;
         }
 
         $this->discountValue = (int) round($this->appliedPromo->calculateDiscount($price));
     }
 
-    public function getTotalPayProperty(): int
+    #[Computed]
+    public function totalPay(): int
     {
         $item = ProductItem::find($this->selectedItemId);
         $payment = PaymentMethod::find($this->selectedPaymentId);
 
-        if (!$item || !$payment) {
+        if (! $item || ! $payment) {
             return 0;
         }
 
@@ -241,20 +268,25 @@ class OrderForm extends Component
         return max(0, $total);
     }
 
+    public function getTotalPayProperty(): int
+    {
+        return $this->totalPay();
+    }
+
     /**
      * Checkout Reguler via Payment Gateway / Simulasi
      */
     public function checkout(WhatsAppService $waService)
     {
         $this->validate([
-            'userId'            => 'required|string|max:100',
-            'zoneId'            => $this->product->input_type === 'id_and_zone' ? 'required|string|max:50' : 'nullable|string|max:50',
-            'selectedItemId'    => 'required|exists:product_items,id',
+            'userId' => 'required|string|max:100',
+            'zoneId' => $this->product->input_type === 'id_and_zone' ? 'required|string|max:50' : 'nullable|string|max:50',
+            'selectedItemId' => 'required|exists:product_items,id',
             'selectedPaymentId' => 'required|exists:payment_methods,id',
-            'contactNumber'     => 'required|string|min:9|max:100',
+            'contactNumber' => 'required|string|min:9|max:100',
         ], [
-            'userId.required'        => 'User ID / Nomor Tujuan wajib diisi.',
-            'zoneId.required'        => 'Zone ID wajib diisi untuk game ini.',
+            'userId.required' => 'User ID / Nomor Tujuan wajib diisi.',
+            'zoneId.required' => 'Zone ID wajib diisi untuk game ini.',
             'contactNumber.required' => 'Nomor WhatsApp atau Email wajib diisi untuk bukti transaksi.',
         ]);
 
@@ -265,24 +297,25 @@ class OrderForm extends Component
         $fee = $payment->fee_flat + (int) round(($basePrice * $payment->fee_percent) / 100);
         $total = max(0, ($basePrice + $fee) - $this->discountValue);
 
-        $invoice = 'INV-' . date('Ymd') . '-' . strtoupper(Str::random(6));
+        $invoice = 'INV-'.date('Ymd').'-'.strtoupper(Str::random(6));
 
         $trx = Transaction::create([
-            'invoice_number'         => $invoice,
-            'product_item_id'        => $item->id,
-            'payment_method_id'      => $payment->id,
-            'promo_code_id'          => $this->appliedPromo?->id,
-            'target_account'         => $this->userId,
-            'target_zone'            => $this->zoneId ?: null,
+            'user_id' => Auth::id(),
+            'invoice_number' => $invoice,
+            'product_item_id' => $item->id,
+            'payment_method_id' => $payment->id,
+            'promo_code_id' => $this->appliedPromo?->id,
+            'target_account' => $this->userId,
+            'target_zone' => $this->zoneId ?: null,
             'contact_email_or_phone' => $this->contactNumber,
-            'amount'                 => $basePrice,
-            'fee_amount'             => $fee,
-            'discount_amount'        => $this->discountValue,
-            'total_amount'           => $total,
-            'payment_status'         => 'unpaid',
-            'delivery_status'        => 'pending',
-            'checkout_source'        => 'direct',
-            'provider_response'      => $this->validatedUsername ? ['account_name' => $this->validatedUsername] : null,
+            'amount' => $basePrice,
+            'fee_amount' => $fee,
+            'discount_amount' => $this->discountValue,
+            'total_amount' => $total,
+            'payment_status' => 'unpaid',
+            'delivery_status' => 'pending',
+            'checkout_source' => 'direct',
+            'provider_response' => $this->validatedUsername ? ['account_name' => $this->validatedUsername] : null,
         ]);
 
         if ($this->appliedPromo) {
@@ -299,54 +332,82 @@ class OrderForm extends Component
      */
     public function payWithBalance(WhatsAppService $waService, DigiflazzService $digiflazz)
     {
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             return redirect()->route('login');
         }
 
         $this->validate([
-            'userId'         => 'required|string|max:100',
-            'zoneId'         => $this->product->input_type === 'id_and_zone' ? 'required|string|max:50' : 'nullable|string|max:50',
+            'userId' => 'required|string|max:100',
+            'zoneId' => $this->product->input_type === 'id_and_zone' ? 'required|string|max:50' : 'nullable|string|max:50',
             'selectedItemId' => 'required|exists:product_items,id',
         ], [
             'userId.required' => 'User ID / Nomor Tujuan wajib diisi.',
             'zoneId.required' => 'Zone ID wajib diisi untuk game ini.',
         ]);
 
-        $user = Auth::user();
         $item = ProductItem::findOrFail($this->selectedItemId);
         $price = $this->getItemPrice($item);
         $finalAmount = max(0, $price - $this->discountValue);
+        $invoice = 'INV-BAL-'.date('Ymd').'-'.strtoupper(Str::random(6));
 
-        if ($user->balance < $finalAmount) {
-            $this->addError('balance', 'Saldo dompet Anda tidak cukup (Sisa: Rp ' . number_format($user->balance, 0, ',', '.') . ').');
+        $trx = null;
+
+        DB::transaction(function () use ($item, $price, $finalAmount, $invoice, &$trx) {
+            $user = Auth::user();
+            // Re-fetch with lock to prevent race condition
+            $lockedUser = User::where('id', $user->id)->lockForUpdate()->first();
+
+            if ($lockedUser->balance < $finalAmount) {
+                $this->addError('balance', 'Saldo dompet Anda tidak cukup (Sisa: Rp '.number_format($lockedUser->balance, 0, ',', '.').').');
+
+                return;
+            }
+
+            $balanceBefore = (float) $lockedUser->balance;
+            $balanceAfter = $balanceBefore - (float) $finalAmount;
+            $lockedUser->update(['balance' => $balanceAfter]);
+
+            // Catat Double-Entry Ledger
+            WalletTransaction::create([
+                'user_id' => $lockedUser->id,
+                'reference_id' => $invoice,
+                'type' => 'debit',
+                'amount' => $finalAmount,
+                'balance_before' => $balanceBefore,
+                'balance_after' => $balanceAfter,
+                'category' => 'order',
+                'description' => "Pembayaran Pesanan {$item->name} ({$invoice})",
+            ]);
+
+            $trx = Transaction::create([
+                'user_id' => $lockedUser->id,
+                'invoice_number' => $invoice,
+                'product_item_id' => $item->id,
+                'payment_method_id' => PaymentMethod::where('is_active', true)->first()?->id ?? 1,
+                'promo_code_id' => $this->appliedPromo?->id,
+                'target_account' => $this->userId,
+                'target_zone' => $this->zoneId ?: null,
+                'contact_email_or_phone' => $lockedUser->email,
+                'amount' => $price,
+                'fee_amount' => 0,
+                'discount_amount' => $this->discountValue,
+                'total_amount' => $finalAmount,
+                'payment_status' => 'paid',
+                'delivery_status' => 'processing',
+                'checkout_source' => 'balance',
+                'provider_response' => $this->validatedUsername ? ['account_name' => $this->validatedUsername] : null,
+            ]);
+
+            if ($this->appliedPromo) {
+                $this->appliedPromo->increment('used_count');
+            }
+
+            // Bagikan komisi referral afiliasi jika member memiliki referrer
+            AffiliateService::processCommission($trx);
+        });
+
+        if ($this->getErrorBag()->isNotEmpty() || ! $trx) {
             return;
-        }
-
-        // Potong Saldo Akun Member
-        $user->decrement('balance', $finalAmount);
-
-        $invoice = 'INV-BAL-' . date('Ymd') . '-' . strtoupper(Str::random(6));
-
-        $trx = Transaction::create([
-            'invoice_number'         => $invoice,
-            'product_item_id'        => $item->id,
-            'payment_method_id'      => PaymentMethod::where('is_active', true)->first()?->id ?? 1,
-            'promo_code_id'          => $this->appliedPromo?->id,
-            'target_account'         => $this->userId,
-            'target_zone'            => $this->zoneId ?: null,
-            'contact_email_or_phone' => $user->email,
-            'amount'                 => $price,
-            'fee_amount'             => 0,
-            'discount_amount'        => $this->discountValue,
-            'total_amount'           => $finalAmount,
-            'payment_status'         => 'paid',
-            'delivery_status'        => 'processing',
-            'checkout_source'        => 'balance',
-            'provider_response'      => $this->validatedUsername ? ['account_name' => $this->validatedUsername] : null,
-        ]);
-
-        if ($this->appliedPromo) {
-            $this->appliedPromo->increment('used_count');
         }
 
         // Teruskan otomatis ke Digiflazz
@@ -355,7 +416,7 @@ class OrderForm extends Component
         } else {
             $trx->update([
                 'delivery_status' => 'success',
-                'serial_number'   => 'AS-BAL-' . strtoupper(Str::random(12)),
+                'serial_number' => 'AS-BAL-'.strtoupper(Str::random(12)),
             ]);
             $waService->sendPaymentSuccess($trx->fresh());
         }
@@ -363,9 +424,21 @@ class OrderForm extends Component
         return redirect()->route('order.invoice', $invoice);
     }
 
+    public function setPromo(string $code): void
+    {
+        $this->promoInput = $code;
+        $this->applyPromo();
+    }
+
     public function render()
     {
         $paymentMethods = PaymentMethod::where('is_active', true)->get();
-        return view('livewire.order-form', compact('paymentMethods'));
+        $activePromos = PromoCode::where('is_active', true)->limit(4)->get();
+
+        return view('livewire.order-form', [
+            'paymentMethods' => $paymentMethods,
+            'activePromos' => $activePromos,
+            'totalPay' => $this->totalPay(),
+        ]);
     }
 }

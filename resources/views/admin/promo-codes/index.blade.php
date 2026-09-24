@@ -22,13 +22,20 @@
             </div>
         @endif
 
-        <!-- Header -->
-        <div
-            class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-200 dark:border-slate-800">
+        <!-- Header Section -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-200 dark:border-slate-800">
             <div>
-                <h1 class="text-2xl font-black tracking-tight">Kupon Promo & Diskon</h1>
-                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Kelola kode voucher belanja, batas pemakaian,
-                    diskon persen/flat, dan masa aktif kupon.</p>
+                <div class="flex items-center gap-2.5">
+                    <h1 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+                        Kupon Promo & Diskon
+                    </h1>
+                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-pink-500/10 text-pink-600 dark:text-pink-400 border border-pink-500/20">
+                        Kampanye Promo
+                    </span>
+                </div>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                    Kelola kode voucher belanja, batas pemakaian, diskon persen/flat, dan masa aktif kupon.
+                </p>
             </div>
             <button @click="openModal = true"
                 class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow transition cursor-pointer">

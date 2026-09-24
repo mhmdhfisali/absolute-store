@@ -2,194 +2,118 @@
   <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=80" width="100%" style="border-radius: 16px;" alt="Absolute Store Banner">
 </p>
 
-<h1 align="center">⚡ Absolute Store - Digital Top-Up & PPOB Platform</h1>
+<h1 align="center">⚡ Absolute Store - Global Digital Top-Up & PPOB Ecosystem</h1>
 
 <p align="center">
-  Platform e-commerce layanan digital modern untuk top-up game online, paket data, token listrik PLN, dan voucher digital dengan otomasi pemrosesan real-time, integrasi payment gateway, dan notifikasi instan WhatsApp.
+  Platform E-Commerce Produk Digital & PPOB kelas dunia dengan estetika modern, otomasi H2H Digiflazz, payment gateway Tripay, notifikasi WhatsApp real-time, arsitektur Double-Entry Wallet Ledger, dan sistem multi-bahasa reaktif (ID / EN).
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white" alt="Laravel">
-  <img src="https://img.shields.io/badge/Livewire-4E56A6?style=for-the-badge&logo=livewire&logoColor=white" alt="Livewire">
-  <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind CSS">
-  <img src="https://img.shields.io/badge/Alpine.js-8BC0D0?style=for-the-badge&logo=alpine.js&logoColor=black" alt="Alpine.js">
-  <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker">
-  <img src="https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white" alt="MySQL">
+  <img src="https://img.shields.io/badge/Laravel-11-FF2D20?style=for-the-badge&logo=laravel&logoColor=white" alt="Laravel">
+  <img src="https://img.shields.io/badge/Livewire-3-4E56A6?style=for-the-badge&logo=livewire&logoColor=white" alt="Livewire">
+  <img src="https://img.shields.io/badge/Tailwind_CSS-3-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind CSS">
+  <img src="https://img.shields.io/badge/Alpine.js-3-8BC0D0?style=for-the-badge&logo=alpine.js&logoColor=black" alt="Alpine.js">
+  <img src="https://img.shields.io/badge/Redis-Cache_%26_Lock-DC382D?style=for-the-badge&logo=redis&logoColor=white" alt="Redis">
+  <img src="https://img.shields.io/badge/MySQL-8.0-4479A1?style=for-the-badge&logo=mysql&logoColor=white" alt="MySQL">
 </p>
 
 ---
 
-## 📌 Gambaran Umum (Overview)
+## 📌 Arsitektur Sistem & Gambaran Umum
 
-**Absolute Store** dibangun dengan arsitektur monolitik modern menggunakan **Laravel 12**, **Livewire 3**, dan **Tailwind CSS**. Sistem dirancang untuk menangani alur transaksi otomatis dari pemesanan storefront, verifikasi pembayaran multi-channel, pemenuhan pesanan ke provider agregator (**Digiflazz H2H**), hingga pengiriman invoice dan kode serial/token via **WhatsApp Gateway (Fonnte)** secara _end-to-end_.
+**Absolute Store** menggabungkan kecepatan render server-side Laravel dengan reaktivitas SPA dari Livewire 3 dan Alpine.js. Platform ini dirancang untuk menangani transaksi volume tinggi dengan keandalan maksimal (*zero-loss, zero-duplicate orders*).
 
----
-
-## 🚀 Fitur Utama
-
-### 1. Etalase & Pemesanan Publik (Storefront)
-
-- **Katalog Terstruktur**: Pengelompokan kategori otomatis (_Game Populer_, _Pulsa & Data_, _Token PLN_, _E-Wallet_, _Streaming_, _PC & Console_).
-- **Formulir Checkout Interaktif**: Dibangun dengan **Livewire 3** untuk pemilihan item nominal, kalkulasi biaya admin dinamis (flat + persentase), dan deteksi tipe input form (`id_and_zone`, `id_only`, `phone_number`, `meter_number`).
-- **Promosi Dinamis**: Carousel banner promo slider otomatis dan _running announcement bar_ (marquee) yang dapat dikelola langsung dari panel admin.
-- **Halaman Invoice & Pelacakan**: Halaman transaksi interaktif dengan batas waktu hitung mundur, instruksi QRIS/Virtual Account, dan fitur pencarian pelacakan pesanan publik (`/tracking`).
-
-### 2. Otomasi & Integrasi Provider
-
-- **Tripay Payment Gateway**: Penerimaan pembayaran melalui QRIS dan Virtual Account otomatis via HMAC SHA256 Webhook.
-- **Digiflazz Fulfillment API (H2H)**: Pemrosesan instan serial number (SN) atau token PLN segera setelah status pembayaran terverifikasi lunas (`PAID`).
-- **WhatsApp Notification Engine (Fonnte)**:
-    - Notifikasi rincian tagihan invoice baru ke pembeli.
-    - Notifikasi bukti pembayaran sukses beserta kode SN / Token.
-    - Notifikasi kegagalan pesanan ke pembeli jika terjadi kendala provider.
-    - _Emergency Alert_ ke WhatsApp Admin jika saldo deposit Digiflazz berada di bawah batas aman (< Rp 100.000).
-
-### 3. Panel Manajemen & Monitoring (Admin Console)
-
-- **Metrik Finansial & Operasional**: Monitoring total omset, mutasi status pesanan (`paid`, `unpaid`, `expired`, `failed`), dan widget **Saldo Deposit Digiflazz** real-time dengan tombol sinkronisasi AJAX (tanpa reload halaman).
-- **Katalog & Margin Keuntungan**: Manajemen SKU produk, harga modal, harga jual, dan upload media gambar (logo thumbnail & banner) langsung ke disk storage lokal Laravel.
-- **Konfigurasi Payment Gateway**: Penyesuaian fleksibel untuk biaya admin flat, persentase fee, dan toggle aktif/nonaktif saluran pembayaran.
-- **Export Laporan Transaksi**: Streaming ekspor data mutasi transaksi ke format CSV hemat memori.
-- **Scheduler Otomatis**: Background cron job untuk pembatalan invoice kedaluwarsa berkala dan pengecekan saldo deposit per jam.
+### Pilar Inti Ekosistem:
+1. **Multi-Language Engine (ID / EN)**: Dual-layer localization yang menggabungkan file JSON standar Laravel dengan Alpine.js reactive global store untuk perpindahan bahasa instan tanpa refresh halaman.
+2. **Unified Profile Flyout**: Card identitas pengguna yang sinkron langsung dengan basis data (`users`, saldo dompet real-time, role, dan tier membership) di Storefront maupun Admin Console.
+3. **Double-Entry Wallet Ledger**: Setiap mutasi saldo akun (deposit, pemotongan order, refund) dicatat secara atomik di tabel `wallet_transactions` dengan saldo sebelum dan sesudah (`balance_before`, `balance_after`) menggunakan transaksi database pesimistik (`lockForUpdate`).
+4. **H2H Fulfillment Otomatis (Digiflazz API)**: Pengiriman item game, pulsa, atau token listrik PLN diproses 1-3 detik setelah pembayaran terkonfirmasi lunas.
+5. **Security Hardening & Idempotency**: Webhook Tripay dan Digiflazz dilindungi tanda tangan kriptografi HMAC SHA256 serta Redis Distributed Lock (`Cache::lock`) untuk menangkal serangan *race condition*.
 
 ---
 
-## 🛠️ Tech Stack & Ekosistem
+## 🚀 Fitur Unggulan
 
-| Lapisan / Komponen            | Teknologi                                       |
-| :---------------------------- | :---------------------------------------------- |
-| **Backend Framework**         | Laravel 12 / PHP 8.4                            |
-| **Reaktivitas UI**            | Laravel Livewire v3 & Alpine.js                 |
-| **Styling & Theme**           | Tailwind CSS (Dark Mode Slate / Indigo Palette) |
-| **Autentikasi Admin**         | Laravel Jetstream & Laravel Sanctum             |
-| **Database**                  | MySQL 8.0                                       |
-| **Infrastruktur / Kontainer** | Docker & Docker Compose                         |
-| **Payment Gateway**           | Tripay API                                      |
-| **Aggregator Provider**       | Digiflazz API                                   |
-| **Notifikasi Gateway**        | Fonnte WhatsApp API                             |
+### 1. Storefront & Checkout (Etalase Konsumen)
+- **Glassmorphism Design System**: Tampilan modern Obsidian Dark (`#080C14`) dengan aksen Silicon Violet & Electric Cyan.
+- **Card Produk Interaktif**: Efek 3D hover lift, ambient glow, thumbnail zoom halus, status indicator berdenyut, dan tombol "Beli Cepat".
+- **Dynamic Language Switcher**: Switcher 🇮🇩 ID / 🇺🇸 EN di navbar dengan persistensi sesi & cookie.
+- **Form Pemesanan Cerdas**: Deteksi tipe input tujuan (`id_only`, `id_and_zone`, `phone_number`, `meter_number`), verifikasi nickname pemain, dan pemilihan saluran pembayaran dinamis.
+- **Dukungan Pembayaran Ganda**:
+  - *Direct Gateway*: QRIS & Virtual Account via Tripay.
+  - *Internal Wallet*: Pembayaran instan 1-klik menggunakan saldo akun member tanpa biaya admin tambahan.
+
+### 2. Member Portal (User Dashboard)
+- **Quick Wallet Card**: Kartu saldo neon dengan rincian tier dan modal instan deposit saldo.
+- **1-Click Copy SN / Voucher**: Salin kode serial number transaksi dengan toast feedback interaktif.
+- **Saved Game Accounts**: Daftar akun game favorit untuk mempercepat proses checkout.
+- **Pelacak Mutasi Deposit**: Catatan status dan nomor transaksi deposit real-time.
+
+### 3. Command Center (Admin Console)
+- **Monitoring Metrik Finansial**: Omset kotor, laba bersih, status pesanan, dan saldo provider Digiflazz.
+- **Manajemen Katalog & Master SKU**: Kontrol harga beli, harga jual publik, dan harga tier reseller.
+- **Financial Ledger & Dispute Center**: Log audit seluruh mutasi kas dan antarmuka penanganan komplain CS.
+- **Sistem Audit Keamanan**: Rekap jejak aktivitas operasional pengguna dan administrator.
 
 ---
 
-## ⚙️ Panduan Instalasi & Menjalankan (Docker Environment)
+## 🛠️ Stack Teknologi
 
-### 1. Kloning Repositori
+| Komponen | Spesifikasi / Teknologi |
+| :--- | :--- |
+| **Backend Framework** | Laravel 11 (PHP 8.4+) |
+| **Reactivity Layer** | Livewire 3 & Alpine.js 3 |
+| **Styling & Design** | Tailwind CSS 3, Glassmorphism, Plus Jakarta Sans |
+| **Database** | MySQL 8.0 / SQLite (Testing) |
+| **Cache & Queue** | Redis 7 |
+| **Aggregator PPOB** | Digiflazz API (H2H) |
+| **Payment Gateway** | Tripay Payment Gateway (QRIS, VA Bank, E-Wallet) |
+| **Notifikasi Instan** | WhatsApp Gateway (Fonnte API) |
+| **Web Server** | Nginx & PHP-FPM / Supervisor Daemon |
 
+---
+
+## ⚙️ Panduan Instalasi Lokal & Docker
+
+### 1. Prasyarat Sistem
+- Docker & Docker Compose **ATAU** PHP 8.4+, Composer, Node.js 20+, MySQL, Redis.
+
+### 2. Menjalankan via Docker Compose (Rekomendasi)
 ```bash
-git clone [https://github.com/mhmdhfisali/absolute-store.git](https://github.com/mhmdhfisali/absolute-store.git)
+# 1. Clone repositori
+git clone https://github.com/mhmdhfisali/absolute-store.git
 cd absolute-store
 
-```
-
-### 2. Konfigurasi Environment File
-
-Salin template konfigurasi dan sesuaikan nilai variabel di `.env`:
-
-```bash
+# 2. Salin environment
 cp .env.example .env
 
-```
-
-Pastikan variabel utama telah terisi:
-
-```env
-APP_NAME="Absolute Store"
-APP_URL=http://localhost:8005
-
-DB_CONNECTION=mysql
-DB_HOST=as-mysql
-DB_PORT=3306
-DB_DATABASE=absolute_store
-DB_USERNAME=root
-DB_PASSWORD=root
-
-# WhatsApp Notification Gateway (Fonnte)
-FONNTE_TOKEN=your_fonnte_device_token
-STORE_ADMIN_WHATSAPP=085945720329
-
-# Payment Gateway (Tripay)
-TRIPAY_API_KEY=your_tripay_api_key
-TRIPAY_PRIVATE_KEY=your_tripay_private_key
-TRIPAY_MERCHANT_CODE=your_tripay_merchant_code
-TRIPAY_MODE=sandbox
-
-# Provider H2H (Digiflazz)
-DIGIFLAZZ_USERNAME=your_digiflazz_username
-DIGIFLAZZ_API_KEY=your_digiflazz_api_key
-DIGIFLAZZ_MODE=development
-DIGIFLAZZ_WEBHOOK_SECRET=your_webhook_secret
-
-```
-
-### 3. Jalankan Kontainer Docker
-
-```bash
+# 3. Jalankan container
 docker compose up -d --build
 
-```
+# 4. Install dependencies di dalam container
+docker exec absolute_store_app composer install
+docker exec absolute_store_app php artisan key:generate
+docker exec absolute_store_app php artisan migrate --seed
+docker exec absolute_store_app php artisan storage:link
 
-### 4. Instalasi Dependency & Inisialisasi Database
-
-Jalankan dependensi, migrasi, dan data katalog awal dari dalam container aplikasi:
-
-```bash
-# Instalasi vendor PHP
-docker exec -it absolute_store_app composer install
-
-# Generate Application Key
-docker exec -it absolute_store_app php artisan key:generate
-
-# Migrasi Database & Seeder Katalog Lengkap
-docker exec -it absolute_store_app php artisan migrate --seed
-
-# Hubungkan Symlink Penyimpanan Media
-docker exec -it absolute_store_app php artisan storage:link
-
-# Compile Asset Frontend
-npm install
-npm run build
-
-```
-
-### 5. Akses Layanan Lokal
-
-- **Storefront Publik**: `http://localhost:8005`
-- **Admin Dashboard**: `http://localhost:8005/admin/dashboard`
-- **Email**: `admin@absolutestore.id`
-- **Password**: `password`
-
-- **Database Management (phpMyAdmin)**: `http://localhost:8085`
-
----
-
-## 🧪 Pengujian & Perintah Artisan Bawaan
-
-Sistem dilengkapi beberapa artisan command kustom untuk verifikasi operasional:
-
-```bash
-# Uji coba koneksi gateway WhatsApp ke nomor tujuan
-docker exec -it absolute_store_app php artisan wa:test 081234567890
-
-# Simulasi pengiriman peringatan saldo darurat ke nomor WhatsApp Admin
-docker exec -it absolute_store_app php artisan wa:test-low-balance 45000
-
-# Eksekusi penjadwalan berkala (Scheduler Worker)
-docker exec -it absolute_store_app php artisan schedule:work
-
+# 5. Build asset frontend
+npm install && npm run build
 ```
 
 ---
 
-## 📄 Lisensi
+## 🧪 Eksekusi Testing Otomatis
 
-Proyek ini didistribusikan di bawah lisensi terbuka [MIT License](https://www.google.com/search?q=LICENSE).
-
-````
-
-Ganti seluruh isi file `README.md` lokal Anda dengan teks di atas, lalu lakukan commit dan push ke GitHub:
-
+Platform ini dilengkapi pengujian fitur dan unit komprehensif menggunakan PHPUnit:
 ```bash
-git add README.md
-git commit -m "docs: revamp README with complete architecture, features, and setup guide"
-git push origin main
+# Menjalankan seluruh test suite
+docker exec absolute_store_app php artisan test --compact
 
-````
+# Menguji idempotency dan webhook
+docker exec absolute_store_app php artisan test --filter=IdempotencyAndWebhookTest
+```
+
+---
+
+## 📜 Lisensi
+Dikembangkan oleh **Absolute Store Engineering Team**. Hak Cipta Dilindungi Undang-Undang.

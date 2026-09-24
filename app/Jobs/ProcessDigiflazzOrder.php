@@ -24,8 +24,8 @@ class ProcessDigiflazzOrder implements ShouldQueue
 
         if ($status === 'sukses') {
             $this->transaction->update([
-                'delivery_status'   => 'success',
-                'serial_number'     => $res['sn'] ?? 'SN-GENERATED',
+                'delivery_status' => 'success',
+                'serial_number' => $res['sn'] ?? 'SN-GENERATED',
                 'provider_response' => $res,
             ]);
 
@@ -33,13 +33,13 @@ class ProcessDigiflazzOrder implements ShouldQueue
             $waService->sendPaymentSuccess($this->transaction);
         } elseif ($status === 'gagal') {
             $this->transaction->update([
-                'delivery_status'   => 'failed',
+                'delivery_status' => 'failed',
                 'provider_response' => $res,
             ]);
         } else {
             // Status Masih Pending (Menunggu Webhook Callback dari Digiflazz)
             $this->transaction->update([
-                'delivery_status'   => 'processing',
+                'delivery_status' => 'processing',
                 'provider_response' => $res,
             ]);
         }

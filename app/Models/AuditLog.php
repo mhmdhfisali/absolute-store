@@ -30,11 +30,11 @@ class AuditLog extends Model
     public static function log(string $action, string $description, ?array $payload = null): self
     {
         return self::create([
-            'user_id'     => auth()->id(),
-            'action'      => $action,
+            'user_id' => auth()->id(),
+            'action' => $action,
             'description' => $description,
-            'ip_address'  => request()->ip(),
-            'payload'     => $payload,
+            'ip_address' => request()->ip(),
+            'payload' => $payload,
         ]);
     }
 }

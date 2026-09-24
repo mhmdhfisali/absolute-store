@@ -23,9 +23,17 @@
         <div
             class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-200 dark:border-slate-800">
             <div>
-                <h1 class="text-2xl font-black tracking-tight">Katalog & Manajemen Produk</h1>
-                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Kelola daftar layanan game, PPOB,
-                    sinkronisasi SKU provider, serta margin harga jual.</p>
+                <div class="flex items-center gap-2.5">
+                    <h1 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+                        Katalog & Produk
+                    </h1>
+                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-violet-500/10 text-violet-600 dark:text-cyan-400 border border-violet-500/20">
+                        Manajemen Master
+                    </span>
+                </div>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                    Kelola daftar layanan game, PPOB, sinkronisasi SKU provider, serta margin harga jual.
+                </p>
             </div>
 
             <div class="flex items-center gap-3">

@@ -47,6 +47,11 @@ class Transaction extends Model
         return $this->belongsTo(ProductItem::class);
     }
 
+    public function item(): BelongsTo
+    {
+        return $this->belongsTo(ProductItem::class, 'product_item_id');
+    }
+
     public function paymentMethod(): BelongsTo
     {
         return $this->belongsTo(PaymentMethod::class);
@@ -54,6 +59,6 @@ class Transaction extends Model
 
     public function promoCode()
     {
-        return $this->belongsTo(\App\Models\PromoCode::class);
+        return $this->belongsTo(PromoCode::class);
     }
 }

@@ -15,9 +15,9 @@ class Banner extends Model
     protected function imageUrl(): Attribute
     {
         return Attribute::make(
-            get: fn(string $value) => filter_var($value, FILTER_VALIDATE_URL)
+            get: fn (string $value) => filter_var($value, FILTER_VALIDATE_URL)
                 ? $value
-                : asset('storage/' . $value),
+                : asset('storage/'.$value),
         );
     }
 }

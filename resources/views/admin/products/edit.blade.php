@@ -8,13 +8,19 @@
             </div>
         @endif
 
-        <!-- Header -->
+        <!-- Header Section -->
         <div class="flex items-center justify-between pb-6 border-b border-slate-200 dark:border-slate-800">
             <div>
                 <a href="{{ route('admin.products.index') }}"
-                    class="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline">&larr; Kembali ke
-                    Daftar Produk</a>
-                <h1 class="text-2xl font-black tracking-tight mt-1">{{ $product->name }}</h1>
+                    class="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline">&larr; Kembali ke Katalog & Produk</a>
+                <div class="flex items-center gap-2.5 mt-1">
+                    <h1 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+                        Edit: {{ $product->name }}
+                    </h1>
+                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-violet-500/10 text-violet-600 dark:text-cyan-400 border border-violet-500/20">
+                        {{ strtoupper($product->category) }}
+                    </span>
+                </div>
             </div>
             <form action="{{ route('admin.products.destroy', $product->id) }}" method="POST"
                 onsubmit="return confirm('Hapus produk beserta seluruh SKU-nya?')">
